@@ -1,0 +1,25 @@
+name: Compilar DualScreen para Windows x64
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+      - name: Configurar .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publicar ejecutable portable
+        run: dotnet publish DualScreen.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -p:DebugSymbols=false -o publish
+      - name: Subir ZIP portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: DualScreen-Windows-x64
+          path: publish/
+          if-no-files-found: error
